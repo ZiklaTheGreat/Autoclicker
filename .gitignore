@@ -1,0 +1,38 @@
+# Build directories and files
+/build/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.cmake
+*.make
+*.o
+*.o.d
+*.bin
+*.log
+*.a
+*.out
+*.ts
+
+# Executables
+autoclicker_app
+
+# CMake generated directories
+CMakeFiles/
+_deps/
+
+# Temporary files and directories
+*.tmp
+/tmp/
+
+# ImGui configuration file (optional, if you want to keep it local)
+imgui.ini
+
+# Common editor/IDE files
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
