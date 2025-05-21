@@ -41,4 +41,4 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(X11 REQUIRED)
 
-target_link_libraries(autoclicker_app PRIVATE OpenGL::GL glfw ${X11_LIBRARIES})
+target_link_libraries(autoclicker_app PRIVATE OpenGL::GL glfw ${X11_LIBRARIES} Xtst)

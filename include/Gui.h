@@ -11,6 +11,7 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/Xutil.h>
+#include <X11/extensions/XTest.h>
 #include <atomic>
 
 enum class MouseButton {
@@ -36,7 +37,7 @@ private:
 
     int minutes = 0; // Minutes
     int seconds = 0; // Seconds
-    int milliseconds = 0; // Milliseconds
+    int milliseconds = 150; // Milliseconds
     int repetitions = 0; // Repetitions
     MouseButton mouse_button = MouseButton::Left; // Mouse button
 
@@ -105,6 +106,7 @@ private:
                             double screen_y = ypos + window_y;
 
                             std::cout << "Global Screen Cursor Position (F9): (" << screen_x << ", " << screen_y << ")" << std::endl;
+                                        startAutoclicker();
                         }
                     }
                 }
@@ -184,10 +186,29 @@ private:
             double screen_y = ypos + window_y;
 
             std::cout << "Screen Cursor Position: (" << screen_x << ", " << screen_y << ")" << std::endl;
+
         }
 
         ImGui::End();
     }
+
+    void clickAt(Display* display, int x, int y, MouseButton button) {
+    int button_code = 1; // Left
+    if (button == MouseButton::Right) button_code = 3;
+    else if (button == MouseButton::Middle) button_code = 2;
+
+    // Move mouse
+    XTestFakeMotionEvent(display, -1, x, y, 0);
+    XFlush(display);
+
+    // Press button
+    XTestFakeButtonEvent(display, button_code, True, 0);
+    XFlush(display);
+
+    // Release button
+    XTestFakeButtonEvent(display, button_code, False, 0);
+    XFlush(display);
+}
 
 public:
     Gui(int width, int height, const char* title)
@@ -224,5 +245,30 @@ public:
     // Check if the window is open
     int is_window_open() {
         return !glfwWindowShouldClose(window);
+    }
+
+    void startAutoclicker() {
+        Display* display = XOpenDisplay(nullptr);
+        if (!display) {
+            std::cerr << "Failed to open X display" << std::endl;
+            return;
+        }
+
+        // Example: use current mouse position
+        Window root = DefaultRootWindow(display);
+        int root_x, root_y, win_x, win_y;
+        unsigned int mask;
+        Window child_return, root_return;
+        XQueryPointer(display, root, &root_return, &child_return, &root_x, &root_y, &win_x, &win_y, &mask);
+
+        for (int i = 0; i < repetitions; ++i) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+            std::this_thread::sleep_for(std::chrono::seconds(seconds));
+            std::this_thread::sleep_for(std::chrono::minutes(minutes));
+
+            clickAt(display, root_x, root_y, mouse_button);
+        }
+
+        XCloseDisplay(display);
     }
 };
